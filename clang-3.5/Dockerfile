@@ -2,12 +2,15 @@ FROM ubuntu:trusty
 MAINTAINER Thomas Kent <teeks99@yahoo.com>
 
 # Enable future toolchain PPA
-RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:ubuntu-toolchain-r/test
+RUN apt-get update \
+ && apt-get install -y software-properties-common \
+ && add-apt-repository -y ppa:ubuntu-toolchain-r/test \
 
 # Install pre-reqs
-RUN apt-get update && apt-get install -y \
- build-essential \
- libstdc++-6-dev
+ && apt-get update \
+ && apt-get install -y \
+  build-essential \
+  libstdc++-6-dev \
 
 # Install Tool
-RUN apt-get update && apt-get install -y clang-3.5
+  clang-3.5
