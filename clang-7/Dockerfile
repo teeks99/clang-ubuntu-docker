@@ -1,4 +1,4 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 MAINTAINER Thomas Kent <docker@teeks99.com>
 
 ADD llvm.list /etc/apt/sources.list.d/
