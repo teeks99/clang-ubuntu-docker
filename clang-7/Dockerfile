@@ -2,13 +2,12 @@ FROM ubuntu:bionic
 MAINTAINER Thomas Kent <docker@teeks99.com>
 
 ADD llvm.list /etc/apt/sources.list.d/
+ADD llvm-snapshot.gpg.key /
 
 # Pre-Req Repos
-RUN apt-get update \
+RUN apt-key add llvm-snapshot.gpg.key \
+ && apt-get update \
  && apt-get install -y software-properties-common \
- && add-apt-repository -y ppa:anthony-justsoftwaresolutions/libcxx \
-# Enable Compiler Repo
- && apt-key adv --keyserver keyserver.ubuntu.com --recv 6084F3CF814B57C1CF12EFD515CF4D18AF4F7421 \
 # Install pre-reqs
  && apt-get update \
  && apt-get install -y \
@@ -17,6 +16,13 @@ RUN apt-get update \
 
 # Install Tool
   clang-7 \
-  libc++-dev \
-  libc++abi-dev
+  clang-tools-7 \
+  clang-format-7 \
+  python-clang-7 \
+  libfuzzer-7-dev \
+  lldb-7 \
+  lld-7 \
+  libc++-7-dev \
+  libc++abi-7-dev \
+  libomp-7-dev 
 
