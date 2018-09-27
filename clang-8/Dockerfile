@@ -1,14 +1,14 @@
-FROM ubuntu:xenial
+FROM ubuntu:bionic
 MAINTAINER Thomas Kent <docker@teeks99.com>
+ARG llvmver=8
 
 ADD llvm.list /etc/apt/sources.list.d/
+ADD llvm-snapshot.gpg.key /
 
 # Pre-Req Repos
-RUN apt-get update \
+RUN apt-key add llvm-snapshot.gpg.key \
+ && apt-get update \
  && apt-get install -y software-properties-common \
- && add-apt-repository -y ppa:anthony-justsoftwaresolutions/libcxx \
-# Enable Compiler Repo
- && apt-key adv --keyserver keyserver.ubuntu.com --recv 6084F3CF814B57C1CF12EFD515CF4D18AF4F7421 \
 # Install pre-reqs
  && apt-get update \
  && apt-get install -y \
@@ -16,7 +16,14 @@ RUN apt-get update \
   build-essential \
 
 # Install Tool
-  clang-8 \
-  libc++-dev \
-  libc++abi-dev
+  clang-$llvmver \
+  clang-tools-$llvmver \
+  clang-format-$llvmver \
+  python-clang-$llvmver \
+  libfuzzer-$llvmver-dev \
+  lldb-$llvmver \
+  lld-$llvmver \
+  libc++-$llvmver-dev \
+  libc++abi-$llvmver-dev \
+  libomp-$llvmver-dev 
 
