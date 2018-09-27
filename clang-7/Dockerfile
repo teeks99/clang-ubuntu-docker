@@ -1,5 +1,6 @@
 FROM ubuntu:bionic
 MAINTAINER Thomas Kent <docker@teeks99.com>
+ARG llvmver=7
 
 ADD llvm.list /etc/apt/sources.list.d/
 ADD llvm-snapshot.gpg.key /
@@ -15,14 +16,14 @@ RUN apt-key add llvm-snapshot.gpg.key \
   build-essential \
 
 # Install Tool
-  clang-7 \
-  clang-tools-7 \
-  clang-format-7 \
-  python-clang-7 \
-  libfuzzer-7-dev \
-  lldb-7 \
-  lld-7 \
-  libc++-7-dev \
-  libc++abi-7-dev \
-  libomp-7-dev 
+  clang-$llvmver \
+  clang-tools-$llvmver \
+  clang-format-$llvmver \
+  python-clang-$llvmver \
+  libfuzzer-$llvmver-dev \
+  lldb-$llvmver \
+  lld-$llvmver \
+  libc++-$llvmver-dev \
+  libc++abi-$llvmver-dev \
+  libomp-$llvmver-dev 
 
