@@ -7,6 +7,7 @@ ADD llvm-snapshot.gpg.key /
 
 # Pre-Req Repos
 RUN apt-key add llvm-snapshot.gpg.key \
+ && rm llvm-snapshot.gpg.key \
  && apt-get update \
  && apt-get install -y software-properties-common \
 # Install pre-reqs
@@ -14,7 +15,6 @@ RUN apt-key add llvm-snapshot.gpg.key \
  && apt-get install -y \
   ca-certificates \
   build-essential \
-
 # Install Tool
   clang-$llvmver \
   clang-tools-$llvmver \
