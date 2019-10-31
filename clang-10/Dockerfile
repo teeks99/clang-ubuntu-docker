@@ -1,4 +1,6 @@
-FROM ubuntu:bionic
+ARG release=bionic
+ARG distro=ubuntu
+FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
 ARG llvmver=10
 
