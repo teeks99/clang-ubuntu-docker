@@ -23,7 +23,7 @@ RUN apt-get update \
   clang-$llvmver \
   clang-tools-$llvmver \
   clang-format-$llvmver \
-  python-clang-$llvmver \
+  python3-clang-$llvmver \
   libfuzzer-$llvmver-dev \
   lldb-$llvmver \
   lld-$llvmver \
