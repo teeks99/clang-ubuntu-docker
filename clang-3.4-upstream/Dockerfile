@@ -14,7 +14,6 @@ RUN apt-get update \
  && apt-get install -y \
   build-essential \
   libstdc++-4.9-dev \
-
 # Install Tool
   clang-3.4 \
 

@@ -5,12 +5,10 @@ MAINTAINER Thomas Kent <teeks99@yahoo.com>
 RUN apt-get update \
  && apt-get install -y software-properties-common \
  && add-apt-repository -y ppa:ubuntu-toolchain-r/test \
-
 # Install pre-reqs
  && apt-get update \
  && apt-get install -y \
   build-essential \
   libstdc++-6-dev \
-
 # Install Tool
   clang-3.6 
