@@ -50,7 +50,7 @@ def test(tag, test_version):
         print(cmd)
         output = subprocess.check_output(cmd, shell=True)
         if expected not in output.decode():
-            msg += f"Expected output: \n{expected}\n"
+            msg = f"Expected output: \n{expected}\n"
             msg += f"Not found in actual output: \n{output}\n"
             raise AssertionError(msg)
         else:
