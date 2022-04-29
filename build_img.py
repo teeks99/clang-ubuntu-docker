@@ -167,7 +167,8 @@ def set_options():
         + " specified last will win")
     parser.add_argument(
         "-r", "--repo", default="test/clang",
-        help="repo to build for and push to")
+        help="repo to build for and push to. Default is test/clang, "+
+        "use teeks99/clang-ubuntu for dockerhub")
     parser.add_argument(
         "-p", "--push", action="store_true", help="push to dockerhub")
     parser.add_argument(
