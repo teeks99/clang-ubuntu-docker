@@ -2,7 +2,7 @@ ARG release=jammy
 ARG distro=ubuntu
 FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
-ARG llvmver=15
+ARG llvmver=16
 
 # Pre-Req Repos
 RUN apt-get update \
