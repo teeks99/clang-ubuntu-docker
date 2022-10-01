@@ -5,7 +5,7 @@ import argparse
 import json
 
 options = None
-push_log = {"versions":[]}
+push_log = {"versions":{}}
 
 versions = [
     # Trusty
