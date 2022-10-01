@@ -100,6 +100,12 @@ def push_image(image):
 
 def create_and_push_manifest(time_image):
     manifest_image = Image(options.repo, options.version[0])
+    cmd = f"docker manifest rm {manifest_image.image}"
+    try:
+        run_my_cmd(cmd)
+    except subprocess.CalledProcessError:
+        pass
+
     cmd = f"docker manifest create {manifest_image.image}"
     cmd += f" --amend {time_image.image}"
     for additional in options.manifest_add:
