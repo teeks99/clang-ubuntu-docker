@@ -28,6 +28,14 @@ def update_base_images():
         subprocess.check_call("docker pull ubuntu:focal", shell=True)
 
 
+def run_my_cmd(cmd):
+    try:
+        print(cmd)
+        subprocess.check_call(cmd, shell=True)
+    except Exception:
+        print("Failure in command: " + cmd)
+        raise
+
 def build(version):
     tag = f"{options.repo}:{version}"
 
@@ -36,12 +44,7 @@ def build(version):
         force = ""
 
     cmd = f"docker build {force} --tag {tag} clang-{version}"
-    print(cmd)
-    try:
-        subprocess.check_call(cmd, shell=True)
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    run_my_cmd(cmd)
     return tag
 
 
@@ -67,45 +70,35 @@ def tag_timestamp(base_tag, version):
     timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
     tag = f"{options.repo}:{version}_{timestamp}"
     cmd = f"docker tag {base_tag} {tag}"
-    try:
-        print(cmd)
-        subprocess.check_call(cmd, shell=True)
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    run_my_cmd(cmd)
     return tag
 
 
 def tag_latest(base_tag):
     tag = f"{options.repo}:latest"
     cmd = f"docker tag {base_tag} {tag}"
-    try:
-        print(cmd)
-        subprocess.check_call(cmd, shell=True)
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    run_my_cmd(cmd)
     return tag
 
 
 def push_tag(tag):
     cmd = f"docker push {tag}"
-    try:
-        print(cmd)
-        subprocess.check_call(cmd, shell=True)
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    run_my_cmd(cmd)
 
+def create_and_push_manifest(time_tag):
+    manifest_tag = f"{options.repo}:{options.version[0]}"
+    cmd = f"docker manifest create {manifest_tag}"
+    cmd += f" --amend {time_tag}"
+    for additional in options.manifest_add:
+        cmd += f" --amend {options.repo}:{additional}"
+    run_my_cmd(cmd)
+
+    cmd = f"docker manifest push {manifest_tag}"
+    run_my_cmd(cmd)
 
 def remove_tag(tag):
     cmd = f"docker rmi {tag}"
-    try:
-        print(cmd)
-        subprocess.check_call(cmd, shell=True)
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    run_my_cmd(cmd)
 
 
 def all():
@@ -135,13 +128,16 @@ def build_one(version):
     if not options.no_latest:
         latest_tag = tag_latest(base_tag)
 
-    if options.no_push_tag:
+    if options.no_push_tag or options.manifest_add:
         base_tag = None
 
     if options.push:
         for tag in (base_tag, time_tag, latest_tag):
             if tag:
                 push_tag(tag)
+
+    if options.manifest_add:
+        create_and_push_manifest(time_tag)
 
     if options.delete_timestamp_tag:
         remove_tag(time_tag)
@@ -182,9 +178,18 @@ def set_options():
     parser.add_argument(
         "-d", "--delete-timestamp-tag", action="store_true",
         help="remove the timestamp tag from the local machine")
+    parser.add_argument(
+        "-m", "--manifest-add", action="append",
+        help="Generate a manifest for the version supplied, using the" +
+        " timestamp upload as the first version add the timestamp(s)" +
+        " specified here as additional versions. Used for generating" + 
+        " multiarch images on different machines.")
 
     global options
     options = parser.parse_args()
+
+    if options.manifest_add and len(options.version) > 1:
+        raise RuntimeError("Cannot support manifest with multiple versions")
 
 
 def run():
