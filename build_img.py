@@ -135,6 +135,9 @@ def build_one(version):
     if not options.no_latest:
         latest_tag = tag_latest(base_tag)
 
+    if options.no_push_tag:
+        base_tag = None
+
     if options.push:
         for tag in (base_tag, time_tag, latest_tag):
             if tag:
@@ -167,6 +170,9 @@ def set_options():
         "--no-latest", action="store_true",
         help="don't update each to latest tag, whichever version is"
         + " specified last will win")
+    parser.add_argument(
+        "-T", "--no-push-tag", action="store_true",
+        help="Do not apply the tag for the version, only the timestamp tag")
     parser.add_argument(
         "-r", "--repo", default="test/clang",
         help="repo to build for and push to. Default is test/clang, "+
