@@ -2,8 +2,10 @@ import sys
 import subprocess
 import datetime
 import argparse
+import json
 
 options = None
+push_log = {"versions":{}}
 
 versions = [
     # Trusty
@@ -19,6 +21,15 @@ versions = [
     ]
 
 test_versions = {"4": "4.0", "5": "5.0", "6": "6.0"}
+
+class Image(object):
+    def __init__(self, repo, tag):
+        self.repo = repo
+        self.tag = tag
+
+    @property
+    def image(self):
+        return f"{self.repo}:{self.tag}"
 
 
 def update_base_images():
@@ -37,19 +48,19 @@ def run_my_cmd(cmd):
         raise
 
 def build(version):
-    tag = f"{options.repo}:{version}"
+    image = Image(options.repo, version)
 
     force = "--no-cache"
     if options.no_force:
         force = ""
 
-    cmd = f"docker build {force} --tag {tag} clang-{version}"
+    cmd = f"docker build {force} --tag {image.image} clang-{version}"
     run_my_cmd(cmd)
-    return tag
+    return image
 
 
-def test(tag, test_version):
-    cmd = f"docker run --rm {tag} clang++-{test_version} --version"
+def test(image, test_version):
+    cmd = f"docker run --rm {image.image} clang++-{test_version} --version"
     expected = f"clang version {test_version}"
     try:
         print(cmd)
@@ -66,38 +77,41 @@ def test(tag, test_version):
         raise
 
 
-def tag_timestamp(base_tag, version):
+def tag_timestamp(base_image, version):
     timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
-    tag = f"{options.repo}:{version}_{timestamp}"
-    cmd = f"docker tag {base_tag} {tag}"
+    tag = f"{version}_{timestamp}"
+    image = Image(options.repo, tag)
+    cmd = f"docker tag {base_image.image} {image.image}"
     run_my_cmd(cmd)
-    return tag
+    return image
 
 
-def tag_latest(base_tag):
-    tag = f"{options.repo}:latest"
-    cmd = f"docker tag {base_tag} {tag}"
+def tag_latest(base_image):
+    image = Image(options.repo,"latest")
+    cmd = f"docker tag {base_image.image} {image.image}"
     run_my_cmd(cmd)
-    return tag
+    return image
 
 
-def push_tag(tag):
-    cmd = f"docker push {tag}"
+def push_image(image):
+    cmd = f"docker push {image.image}"
     run_my_cmd(cmd)
 
-def create_and_push_manifest(time_tag):
-    manifest_tag = f"{options.repo}:{options.version[0]}"
-    cmd = f"docker manifest create {manifest_tag}"
-    cmd += f" --amend {time_tag}"
+
+def create_and_push_manifest(time_image):
+    manifest_image = Image(options.repo, options.version[0])
+    cmd = f"docker manifest create {manifest_image.image}"
+    cmd += f" --amend {time_image.image}"
     for additional in options.manifest_add:
         cmd += f" --amend {options.repo}:{additional}"
     run_my_cmd(cmd)
 
-    cmd = f"docker manifest push {manifest_tag}"
+    cmd = f"docker manifest push {manifest_image.image}"
     run_my_cmd(cmd)
 
-def remove_tag(tag):
-    cmd = f"docker rmi {tag}"
+
+def remove_image(image):
+    cmd = f"docker rmi {image.image}"
     run_my_cmd(cmd)
 
 
@@ -108,39 +122,48 @@ def all():
 
 def build_one(version):
     tags = []
-    base_tag = None
-    time_tag = None
-    latest_tag = None
+    base_image = None
+    time_image = None
+    latest_image = None
 
     if not options.no_build:
-        base_tag = build(version)
+        base_image = build(version)
 
     if not options.no_test:
         tv = version
         if version in test_versions:
             tv = test_versions[version]
 
-        test(base_tag, tv)
+        test(base_image, tv)
 
     if not options.no_tag_timestamp:
-        time_tag = tag_timestamp(base_tag, version)
+        time_image = tag_timestamp(base_image, version)
 
     if not options.no_latest:
-        latest_tag = tag_latest(base_tag)
+        latest_image = tag_latest(base_image)
 
     if options.no_push_tag or options.manifest_add:
-        base_tag = None
+        base_image = None
 
     if options.push:
-        for tag in (base_tag, time_tag, latest_tag):
-            if tag:
-                push_tag(tag)
+        for img in (base_image, time_image, latest_image):
+            if img:
+                push_image(img)
+
+        pushes = {}
+        if base_image:
+            pushes["base"] = base_image.tag
+        if time_image:
+            pushes["timestamp"] = time_image.tag
+        if latest_image:
+            pushes["latest"] = True
+        push_log["versions"][version] = pushes
 
     if options.manifest_add:
-        create_and_push_manifest(time_tag)
+        create_and_push_manifest(time_image)
 
     if options.delete_timestamp_tag:
-        remove_tag(time_tag)
+        remove_image(time_image)
 
 
 def set_options():
@@ -184,6 +207,9 @@ def set_options():
         " timestamp upload as the first version add the timestamp(s)" +
         " specified here as additional versions. Used for generating" + 
         " multiarch images on different machines.")
+    parser.add_argument(
+        "-l", "--log-file", default="",
+        help="json file to log pushes into")
 
     global options
     options = parser.parse_args()
@@ -194,6 +220,7 @@ def set_options():
 
 def run():
     set_options()
+    push_log["repo"] = options.repo
 
     if options.version:
         global versions
@@ -202,6 +229,10 @@ def run():
     update_base_images()
 
     all()
+
+    if options.log_file:
+        with open(options.log_file, "w") as f:
+            json.dump(push_log, f)
 
 
 if __name__ == "__main__":
