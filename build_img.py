@@ -208,8 +208,8 @@ def set_options():
         " specified here as additional versions. Used for generating" + 
         " multiarch images on different machines.")
     parser.add_argument(
-        "-l", "--log-file", action="store_true",
-        help="json file to log pushes to")
+        "-l", "--log-file", default="",
+        help="json file to log pushes into")
 
     global options
     options = parser.parse_args()
