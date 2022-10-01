@@ -85,15 +85,15 @@ def push_tag(tag):
     cmd = f"docker push {tag}"
     run_my_cmd(cmd)
 
-def create_and_push_mainfest(time_tag):
+def create_and_push_manifest(time_tag):
     manifest_tag = f"{options.repo}:{options.version[0]}"
-    cmd = f"docker mainfest create {manifest_tag}"
+    cmd = f"docker manifest create {manifest_tag}"
     cmd += f" --amend {time_tag}"
     for additional in options.manifest_add:
         cmd += f" --amend {options.repo}:{additional}"
     run_my_cmd(cmd)
 
-    cmd = f"docker mainfest push {manifest_tag}"
+    cmd = f"docker manifest push {manifest_tag}"
     run_my_cmd(cmd)
 
 def remove_tag(tag):
@@ -137,7 +137,7 @@ def build_one(version):
                 push_tag(tag)
 
     if options.manifest_add:
-        create_and_push_mainfest(time_tag)
+        create_and_push_manifest(time_tag)
 
     if options.delete_timestamp_tag:
         remove_tag(time_tag)
