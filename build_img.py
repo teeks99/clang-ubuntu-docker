@@ -232,7 +232,7 @@ def run():
 
     if options.log_file:
         with open(options.log_file, "w") as f:
-            json.dump(f, push_log)
+            json.dump(push_log, f)
 
 
 if __name__ == "__main__":
