@@ -126,7 +126,7 @@ def all():
     for version in versions:
         latest = False
         if options.latest and version == versions[-1]:
-            latest = true
+            latest = True
         build_one(version)
 
 
