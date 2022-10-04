@@ -127,7 +127,7 @@ def all():
         latest = False
         if options.latest and version == versions[-1]:
             latest = True
-        build_one(version)
+        build_one(version, latest)
 
 
 def build_one(version, push_latest=False):
@@ -149,7 +149,7 @@ def build_one(version, push_latest=False):
     if not options.no_tag_timestamp:
         time_image = tag_timestamp(base_image, version)
 
-    if not push_latest:
+    if push_latest:
         if not options.manifest_add:
             latest_image = tag_latest(base_image)
 
