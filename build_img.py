@@ -1,3 +1,4 @@
+from operator import truediv
 import sys
 import subprocess
 import datetime
@@ -98,8 +99,8 @@ def push_image(image):
     run_my_cmd(cmd)
 
 
-def create_and_push_manifest(time_image):
-    manifest_image = Image(options.repo, options.version[0])
+def create_and_push_manifest(time_image, version_tag):
+    manifest_image = Image(options.repo, version_tag)
     cmd = f"docker manifest rm {manifest_image.image}"
     try:
         run_my_cmd(cmd)
@@ -123,10 +124,13 @@ def remove_image(image):
 
 def all():
     for version in versions:
+        latest = False
+        if options.latest and version == versions[-1]:
+            latest = true
         build_one(version)
 
 
-def build_one(version):
+def build_one(version, push_latest=False):
     tags = []
     base_image = None
     time_image = None
@@ -145,8 +149,9 @@ def build_one(version):
     if not options.no_tag_timestamp:
         time_image = tag_timestamp(base_image, version)
 
-    if not options.no_latest:
-        latest_image = tag_latest(base_image)
+    if not push_latest:
+        if not options.manifest_add:
+            latest_image = tag_latest(base_image)
 
     if options.no_push_tag or options.manifest_add:
         base_image = None
@@ -166,7 +171,9 @@ def build_one(version):
         push_log["versions"][version] = pushes
 
     if options.manifest_add:
-        create_and_push_manifest(time_image)
+        create_and_push_manifest(time_image, version)
+        if push_latest:
+            create_and_push_manifest(time_image, "latest")
 
     if options.delete_timestamp_tag:
         remove_image(time_image)
@@ -192,9 +199,9 @@ def set_options():
     parser.add_argument(
         "--no-tag-timestamp", action="store_true", help="only version tag")
     parser.add_argument(
-        "--no-latest", action="store_true",
-        help="don't update each to latest tag, whichever version is"
-        + " specified last will win")
+        "--latest", action="store_true",
+        help="Update latest tag. If multiple versions, applies to last one." +
+        " If --manifest-add specified will create a latest manifest")
     parser.add_argument(
         "-T", "--no-push-tag", action="store_true",
         help="Do not apply the tag for the version, only the timestamp tag")
