@@ -1,4 +1,3 @@
-from operator import truediv
 import sys
 import subprocess
 import datetime
@@ -38,6 +37,7 @@ def update_base_images():
         subprocess.check_call("docker pull ubuntu:xenial", shell=True)
         subprocess.check_call("docker pull ubuntu:bionic", shell=True)
         subprocess.check_call("docker pull ubuntu:focal", shell=True)
+        subprocess.check_call("docker pull ubuntu:jammy", shell=True)
 
 
 def run_my_cmd(cmd):
