@@ -38,7 +38,7 @@ RUN apt-get update \
   # MLIR
   libmlir-15-dev mlir-15-tools \
   # Bolt
-  libbolt-$llvmver-dev bolt-$llvmver \
+  # Doesn't work on aarch64 libbolt-$llvmver-dev bolt-$llvmver \
   # LLVM WASM
   libclang-rt-$llvmver-dev-wasm32 \
   libclang-rt-$llvmver-dev-wasm64 \
