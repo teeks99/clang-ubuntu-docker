@@ -32,5 +32,7 @@ RUN apt-get update \
   libc++-$llvmver-dev \
   libc++abi-$llvmver-dev \
   libomp-$llvmver-dev  \
+  libunwind-$llvmver-dev \
  # Make an alias for the versioned executable
- && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++
+ && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
+ && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
