@@ -33,5 +33,8 @@ RUN mv llvm.list /etc/apt/sources.list.d/ \
   lld-$llvmver \
   libc++-$llvmver-dev \
   libc++abi-$llvmver-dev \
-  libomp-$llvmver-dev 
+  libomp-$llvmver-dev \
+ # Make an alias for the versioned executable
+ && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++
+
 

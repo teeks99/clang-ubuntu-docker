@@ -31,5 +31,20 @@ RUN apt-get update \
   lld-$llvmver \
   libc++-$llvmver-dev \
   libc++abi-$llvmver-dev \
-  libomp-$llvmver-dev 
-
+  libomp-$llvmver-dev \
+  libunwind-$llvmver-dev \
+  libpolly-$llvmver-dev \
+  libclc-$llvmver-dev \
+  # MLIR
+  libmlir-15-dev mlir-15-tools \
+  # Bolt
+  libbolt-$llvmver-dev bolt-$llvmver \
+  # LLVM WASM
+  libclang-rt-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm64 \
+  libc++-$llvmver-dev-wasm32 \
+  libc++abi-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm64 \
+ # Make an alias for the versioned executable
+ && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++
