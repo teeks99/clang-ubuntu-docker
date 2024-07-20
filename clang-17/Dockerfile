@@ -34,7 +34,7 @@ RUN apt-get update \
   libpolly-$llvmver-dev \
   libclc-$llvmver-dev \
   # MLIR
-  libmlir-15-dev mlir-15-tools \
+  libmlir-$llvmver-dev mlir-$llvmver-tools \
   # Bolt
   # Doesn't work on aarch64 libbolt-$llvmver-dev bolt-$llvmver \
   # LLVM WASM
