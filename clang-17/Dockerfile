@@ -1,4 +1,4 @@
-ARG release=jammy
+ARG release=noble
 ARG distro=ubuntu
 FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
@@ -10,8 +10,7 @@ RUN apt-get update \
   software-properties-common \
   gnupg \
 # Needed for repo access
-  apt-transport-https \
-  ca-certificates 
+  apt-transport-https
 
 ADD llvm.list /etc/apt/sources.list.d/
 ADD llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
@@ -19,7 +18,6 @@ ADD llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
 # Install pre-reqs
 RUN apt-get update \
  && apt-get install -y \
-  ca-certificates \
   build-essential \
 # Install Tool
   clang-$llvmver \

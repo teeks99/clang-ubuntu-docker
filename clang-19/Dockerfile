@@ -1,4 +1,4 @@
-ARG release=jammy
+ARG release=noble
 ARG distro=ubuntu
 FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
