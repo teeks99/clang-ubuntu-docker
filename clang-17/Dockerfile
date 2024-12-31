@@ -4,8 +4,13 @@ FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
 ARG llvmver=17
 
-# Pre-Req Repos
-RUN apt-get update \
+RUN echo staring build with $release \
+ # Remove the default 'ubuntu' non-root user, we will create our own at runtime
+ && touch /var/mail/ubuntu \
+ && chown ubuntu /var/mail/ubuntu \
+ && userdel -r ubuntu \
+ # Basic prereqs
+ && apt-get update \
  && apt-get install -y \
   software-properties-common \
   gnupg \
