@@ -1,0 +1,3 @@
+deb http://apt.llvm.org/noble/ llvm-toolchain-noble main
+deb-src http://apt.llvm.org/noble/ llvm-toolchain-noble main
+
