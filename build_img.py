@@ -93,7 +93,7 @@ def push_image(image):
     run_my_cmd(cmd)
 
 
-def create_and_push_manifest(time_image, version_tag):
+def create_and_push_manifest(version_tag, amend_tags):
     manifest_image = Image(options.repo, version_tag)
     cmd = f"docker manifest rm {manifest_image.image}"
     try:
@@ -102,9 +102,8 @@ def create_and_push_manifest(time_image, version_tag):
         pass
 
     cmd = f"docker manifest create {manifest_image.image}"
-    cmd += f" --amend {time_image.image}"
-    for additional in options.manifest_add:
-        cmd += f" --amend {options.repo}:{additional}"
+    for tag in amend_tags:
+        cmd += f" --amend {options.repo}:{tag}"
     run_my_cmd(cmd)
 
     cmd = f"docker manifest push {manifest_image.image}"
@@ -129,6 +128,23 @@ def build_one(version, push_latest=False):
     base_image = None
     time_image = None
     latest_image = None
+
+    if options.manifest_only:
+        amend_tags = options.manifest_only
+        timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
+        time_tag = f"{version}_{timestamp}"
+        
+        create_and_push_manifest(time_tag, amend_tags)
+        create_and_push_manifest(version, amend_tags)
+        if push_latest:
+            create_and_push_manifest("latest", amend_tags)
+        
+        pushes = {}
+        pushes["timestamp"] = time_tag
+        if push_latest:
+            pushes["latest"] = True
+        push_log["versions"][version] = pushes
+        return
 
     if not options.no_build:
         base_image = build(version)
@@ -165,9 +181,10 @@ def build_one(version, push_latest=False):
         push_log["versions"][version] = pushes
 
     if options.manifest_add:
-        create_and_push_manifest(time_image, version)
+        amend_tags = [time_image.tag] + options.manifest_add
+        create_and_push_manifest(version, amend_tags)
         if push_latest:
-            create_and_push_manifest(time_image, "latest")
+            create_and_push_manifest("latest", amend_tags)
 
     if options.delete_timestamp_tag:
         remove_image(time_image)
@@ -215,6 +232,10 @@ def set_options():
         " specified here as additional versions. Used for generating" + 
         " multiarch images on different machines.")
     parser.add_argument(
+        "--manifest-only", nargs="+",
+        help="Create a manifest from the provided timestamp tags, without building." +
+        " Will create a manifest for the version and a new timestamp.")
+    parser.add_argument(
         "-l", "--log-file", default="",
         help="json file to log pushes into")
 
@@ -223,6 +244,9 @@ def set_options():
 
     if options.manifest_add and len(options.version) > 1:
         raise RuntimeError("Cannot support manifest with multiple versions")
+
+    if options.manifest_only and len(options.version) > 1:
+        raise RuntimeError("Cannot support manifest-only with multiple versions")
 
 
 def run():
