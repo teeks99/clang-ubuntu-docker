@@ -3,6 +3,7 @@ import subprocess
 import datetime
 import argparse
 import json
+import platform
 
 options = None
 push_log = {"versions":{}}
@@ -74,7 +75,8 @@ def test(image, test_version):
 
 def tag_timestamp(base_image, version):
     timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
-    tag = f"{version}_{timestamp}"
+    arch_str = f"_{options.arch}" if options.arch else ""
+    tag = f"{version}{arch_str}_{timestamp}"
     image = Image(options.repo, tag)
     cmd = f"docker tag {base_image.image} {image.image}"
     run_my_cmd(cmd)
@@ -236,6 +238,9 @@ def set_options():
         help="Create a manifest from the provided timestamp tags, without building." +
         " Will create a manifest for the version and a new timestamp.")
     parser.add_argument(
+        "--arch", nargs='?', const='auto', default="",
+        help="Architecture string to include in the timestamp tag (e.g. amd64, arm64). If passed without value, it autodetects.")
+    parser.add_argument(
         "-l", "--log-file", default="",
         help="json file to log pushes into")
 
@@ -252,6 +257,15 @@ def set_options():
 def run():
     set_options()
     push_log["repo"] = options.repo
+
+    if options.arch == 'auto':
+        machine = platform.machine().lower()
+        if machine in ['x86_64', 'amd64']:
+            options.arch = 'amd64'
+        elif machine in ['aarch64', 'arm64']:
+            options.arch = 'arm64'
+        else:
+            options.arch = machine
 
     if options.version:
         global versions

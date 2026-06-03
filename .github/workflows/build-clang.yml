@@ -20,7 +20,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and Push AMD64
         run: |
-          python build_img.py -v 23 -r teeks99/clang-ubuntu -p -T -l amd64_log.json
+          python build_img.py -v 23 -r teeks99/clang-ubuntu -p -T -l amd64_log.json --arch
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
@@ -38,7 +38,7 @@ jobs:
           password: ${{ secrets.DOCKERHUB_TOKEN }}
       - name: Build and Push ARM64
         run: |
-          python build_img.py -v 23 -r teeks99/clang-ubuntu -p -T -l arm64_log.json
+          python build_img.py -v 23 -r teeks99/clang-ubuntu -p -T -l arm64_log.json --arch
       - name: Upload Artifact
         uses: actions/upload-artifact@v4
         with:
