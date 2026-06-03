@@ -5,6 +5,9 @@ on:
     - cron: '0 0 * * 0' # Every Sunday at midnight
   workflow_dispatch:
 
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-amd64:
     runs-on: ubuntu-latest
