@@ -1,7 +1,7 @@
-ARG release=noble
+ARG release=resolute
 ARG distro=ubuntu
 FROM $distro:$release
-MAINTAINER Thomas Kent <docker@teeks99.com>
+LABEL org.opencontainers.image.authors="Thomas Kent <docker@teeks99.com>"
 ARG llvmver=22
 
 RUN echo staring build with $release \

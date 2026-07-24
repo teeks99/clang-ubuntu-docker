@@ -1,4 +1,4 @@
-ARG release=noble
+ARG release=resolute
 ARG distro=ubuntu
 FROM $distro:$release
 LABEL org.opencontainers.image.authors="Thomas Kent <docker@teeks99.com>"
