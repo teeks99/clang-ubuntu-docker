@@ -26,33 +26,33 @@ RUN apt-get update \
  && apt-get install -y \
   ca-certificates \
   build-essential \
-# # Install Tool
-#   clang-$llvmver \
-#   clang-tidy-$llvmver \
-#   clang-tools-$llvmver \
-#   clang-format-$llvmver \
-#   python3-clang-$llvmver \
-#   libfuzzer-$llvmver-dev \
-#   lldb-$llvmver \
-#   lld-$llvmver \
-#   libc++-$llvmver-dev \
-#   libc++abi-$llvmver-dev \
-#   libomp-$llvmver-dev \
-#   libunwind-$llvmver-dev \
-#   libpolly-$llvmver-dev \
-#   libclc-$llvmver-dev \
-#   # MLIR
-#   libmlir-$llvmver-dev mlir-$llvmver-tools \
-#   # Bolt
-#   # Doesn't work on aarch64 libbolt-$llvmver-dev bolt-$llvmver \
-#   # LLVM WASM
-#   libclang-rt-$llvmver-dev-wasm32 \
-#   libclang-rt-$llvmver-dev-wasm64 \
-#   libc++-$llvmver-dev-wasm32 \
-#   libc++abi-$llvmver-dev-wasm32 \
-#   libclang-rt-$llvmver-dev-wasm32 \
-#   libclang-rt-$llvmver-dev-wasm64 \
-#  # Make an alias for the versioned executable
-#  && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
-#  && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
+# Install Tool
+  clang-$llvmver \
+  clang-tidy-$llvmver \
+  clang-tools-$llvmver \
+  clang-format-$llvmver \
+  python3-clang-$llvmver \
+  libfuzzer-$llvmver-dev \
+  lldb-$llvmver \
+  lld-$llvmver \
+  libc++-$llvmver-dev \
+  libc++abi-$llvmver-dev \
+  libomp-$llvmver-dev \
+  libunwind-$llvmver-dev \
+  libpolly-$llvmver-dev \
+  libclc-$llvmver-dev \
+  # MLIR
+  libmlir-$llvmver-dev mlir-$llvmver-tools \
+  # Bolt
+  # Doesn't work on aarch64 libbolt-$llvmver-dev bolt-$llvmver \
+  # LLVM WASM
+  libclang-rt-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm64 \
+  libc++-$llvmver-dev-wasm32 \
+  libc++abi-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm32 \
+  libclang-rt-$llvmver-dev-wasm64 \
+ # Make an alias for the versioned executable
+ && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
+ && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
  
