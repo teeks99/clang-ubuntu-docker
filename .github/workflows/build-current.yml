@@ -7,7 +7,7 @@ on:
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
-  CLANG_VERSION: '22'
+  CLANG_VERSION: '23'
 
 jobs:
   build-amd64:
