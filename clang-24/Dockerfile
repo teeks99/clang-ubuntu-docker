@@ -50,8 +50,6 @@ RUN apt-get update \
   libclang-rt-$llvmver-dev-wasm64 \
   libc++-$llvmver-dev-wasm32 \
   libc++abi-$llvmver-dev-wasm32 \
-  libclang-rt-$llvmver-dev-wasm32 \
-  libclang-rt-$llvmver-dev-wasm64 \
  # Make an alias for the versioned executable
  && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
  && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
