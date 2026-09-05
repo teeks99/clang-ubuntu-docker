@@ -15,7 +15,8 @@ RUN echo staring build with $release \
   software-properties-common \
   gnupg \
 # Needed for repo access
-  apt-transport-https
+  apt-transport-https \
+ && rm -rf /var/lib/apt/lists/*
 
 ADD llvm.list /etc/apt/sources.list.d/
 ADD llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
@@ -49,5 +50,6 @@ RUN apt-get update \
   libc++abi-$llvmver-dev-wasm32 \
  # Make an alias for the versioned executable
  && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
- && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
+ && ln -s /usr/bin/clang-$llvmver /usr/bin/clang \
+ && rm -rf /var/lib/apt/lists/*
  

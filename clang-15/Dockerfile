@@ -11,7 +11,8 @@ RUN apt-get update \
   gnupg \
 # Needed for repo access
   apt-transport-https \
-  ca-certificates 
+  ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 ADD llvm.list /etc/apt/sources.list.d/
 ADD llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
@@ -35,4 +36,5 @@ RUN apt-get update \
   libunwind-$llvmver-dev \
  # Make an alias for the versioned executable
  && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
- && ln -s /usr/bin/clang-$llvmver /usr/bin/clang
+ && ln -s /usr/bin/clang-$llvmver /usr/bin/clang \
+ && rm -rf /var/lib/apt/lists/*

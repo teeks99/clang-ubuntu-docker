@@ -7,7 +7,8 @@ RUN apt-get update \
   software-properties-common \
 # Needed for repo access
   apt-transport-https \
-  ca-certificates 
+  ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 ADD llvm.list /etc/apt/sources.list.d/
 
@@ -20,5 +21,6 @@ RUN apt-key adv --keyserver keyserver.ubuntu.com --recv 6084F3CF814B57C1CF12EFD5
 # Install Tool
   clang-4.0 \
   libc++-dev \
-  libc++abi-dev
+  libc++abi-dev \
+ && rm -rf /var/lib/apt/lists/*
 

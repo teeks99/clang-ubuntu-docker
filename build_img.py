@@ -76,7 +76,7 @@ def test(image, test_version):
 
 
 def tag_timestamp(base_image, version):
-    timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
+    timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M")
     arch_str = f"_{options.arch}" if options.arch else ""
     tag = f"{version}{arch_str}_{timestamp}"
     image = Image(options.repo, tag)
@@ -135,7 +135,7 @@ def build_one(version, push_latest=False):
 
     if options.manifest_only:
         amend_tags = options.manifest_only
-        timestamp = datetime.datetime.utcnow().strftime("%Y%m%d_%H%M")
+        timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M")
         time_tag = f"{version}_{timestamp}"
         
         create_and_push_manifest(time_tag, amend_tags)

@@ -7,7 +7,8 @@ RUN apt-get update \
   software-properties-common \
 # Needed for repo access
   apt-transport-https \
-  ca-certificates 
+  ca-certificates \
+ && rm -rf /var/lib/apt/lists/*
 
 ADD llvm.list /etc/apt/sources.list.d/
 
@@ -21,5 +22,6 @@ RUN add-apt-repository -y ppa:anthony-justsoftwaresolutions/libcxx \
 # Install Tool
   clang-5.0 \
   libc++-dev \
-  libc++abi-dev
+  libc++abi-dev \
+ && rm -rf /var/lib/apt/lists/*
 
