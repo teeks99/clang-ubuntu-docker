@@ -11,4 +11,5 @@ RUN apt-get update \
   build-essential \
   libstdc++-6-dev \
 # Install Tool
-  clang-3.5
+  clang-3.5 \
+ && rm -rf /var/lib/apt/lists/*

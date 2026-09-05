@@ -11,4 +11,5 @@ RUN apt-get update \
   ca-certificates \
   build-essential \
 # Install Tool
-  clang-3.2
+  clang-3.2 \
+ && rm -rf /var/lib/apt/lists/*

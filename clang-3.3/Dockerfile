@@ -12,5 +12,6 @@ RUN apt-get update \
   clang-3.3 \
 # Make a versiond symlink
  && cd /usr/bin \
- && ln -s clang++ clang++-3.3
+ && ln -s clang++ clang++-3.3 \
+ && rm -rf /var/lib/apt/lists/*
 

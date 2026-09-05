@@ -18,14 +18,16 @@ RUN apt-get update \
  && cd /usr/bin \
  && ln -s python2.7 python \
 # Speed up fetch
- && git config --global submodule.fetchJobs 40
+ && git config --global submodule.fetchJobs 40 \
+ && rm -rf /var/lib/apt/lists/*
 
 # Enable Compiler Repo
 ADD llvm.list /etc/apt/sources.list.d/
 RUN apt-key adv --keyserver keyserver.ubuntu.com --recv 6084F3CF814B57C1CF12EFD515CF4D18AF4F7421 \
 # Install Tool
  && apt-get update \
- && apt-get install -y clang-5.0 libc++-dev libc++abi-dev
+ && apt-get install -y clang-5.0 libc++-dev libc++abi-dev \
+ && rm -rf /var/lib/apt/lists/*
 
 # Symlink tools
 

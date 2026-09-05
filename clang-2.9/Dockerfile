@@ -11,4 +11,5 @@ RUN apt-get update \
   ca-certificates \
   build-essential \
 # Install Tool
-  clang-2.9
+  clang-2.9 \
+ && rm -rf /var/lib/apt/lists/*

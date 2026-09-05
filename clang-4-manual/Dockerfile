@@ -2,7 +2,7 @@ FROM ubuntu:xenial
 MAINTAINER Thomas Kent <docker@teeks99.com>
 
 # Pre-Req Repos
-RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa
+RUN apt-get update && apt-get install -y software-properties-common && add-apt-repository -y ppa:git-core/ppa && rm -rf /var/lib/apt/lists/*
 
 # Install pre-reqs
 RUN apt-get update && apt-get install -y \
@@ -15,7 +15,8 @@ RUN apt-get update && apt-get install -y \
  python3.5 \
  python3.5-dev \
  libbz2-dev \
- zlib1g-dev
+ zlib1g-dev \
+ && rm -rf /var/lib/apt/lists/*
 RUN cd /usr/bin && ln -s python2.7 python
 
 # Enable Compiler Repo

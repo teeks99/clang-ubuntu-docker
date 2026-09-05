@@ -16,4 +16,4 @@ RUN apt-get update \
   libstdc++-4.9-dev \
 # Install Tool
   clang-3.4 \
-
+ && rm -rf /var/lib/apt/lists/*
