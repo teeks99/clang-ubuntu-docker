@@ -4,7 +4,7 @@ FROM $distro:$release
 MAINTAINER Thomas Kent <docker@teeks99.com>
 ARG llvmver=19
 
-RUN echo staring build with $release \
+RUN echo starting build \
  # Remove the default 'ubuntu' non-root user, we will create our own at runtime
  && touch /var/mail/ubuntu \
  && chown ubuntu /var/mail/ubuntu \
