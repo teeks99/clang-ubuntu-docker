@@ -7,10 +7,7 @@ ARG llvmver=15
 # Pre-Req Repos
 RUN apt-get update \
  && apt-get install -y \
-  software-properties-common \
-  gnupg \
 # Needed for repo access
-  apt-transport-https \
   ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 

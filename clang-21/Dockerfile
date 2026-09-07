@@ -12,10 +12,7 @@ RUN echo starting build \
  # Basic prereqs
  && apt-get update \
  && apt-get install -y \
-  software-properties-common \
-  gnupg \
 # Needed for repo access
-  apt-transport-https \
   ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
