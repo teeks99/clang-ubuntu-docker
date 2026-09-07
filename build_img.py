@@ -52,7 +52,11 @@ def build(version):
     if options.no_force:
         force = ""
 
-    cmd = f"docker build --pull {force} --tag {image.image} clang-{version}"
+    pull = "--pull"
+    if options.no_update_base:
+        pull = ""
+
+    cmd = f"docker build {pull} {force} --tag {image.image} clang-{version}"
     run_my_cmd(cmd)
     return image
 
