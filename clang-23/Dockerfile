@@ -52,4 +52,3 @@ RUN apt-get update \
  && ln -s /usr/bin/clang++-$llvmver /usr/bin/clang++ \
  && ln -s /usr/bin/clang-$llvmver /usr/bin/clang \
  && rm -rf /var/lib/apt/lists/*
- 
