@@ -9,18 +9,10 @@ options = None
 push_log = {"versions":{}}
 
 versions = [
-    # Trusty
-    # "2.9", "3.0", "3.1", "3.2", "3.3", "3.4", "3.5", "3.6", "3.7", "3.8",
-    # Xenial
-    "3.9", "4", "5", "6",
-    # Bionic
-    "7", "8", "9", "10",
-    # Focal
-    "11", "12", "13", "14",
     # Jammy
-    "15", "16", 
-    # Noble 
-    "17", "18", "19", "20", 
+    "15", "16",
+    # Noble
+    "17", "18", "19", "20",
     # Resolute
     "21", "22", "23"
     ]
@@ -141,12 +133,12 @@ def build_one(version, push_latest=False):
         amend_tags = options.manifest_only
         timestamp = datetime.datetime.now(datetime.timezone.utc).strftime("%Y%m%d_%H%M")
         time_tag = f"{version}_{timestamp}"
-        
+
         create_and_push_manifest(time_tag, amend_tags)
         create_and_push_manifest(version, amend_tags)
         if push_latest:
             create_and_push_manifest("latest", amend_tags)
-        
+
         pushes = {}
         pushes["timestamp"] = time_tag
         if push_latest:
@@ -237,7 +229,7 @@ def set_options():
         "-m", "--manifest-add", action="append",
         help="Generate a manifest for the version supplied, using the" +
         " timestamp upload as the first version add the timestamp(s)" +
-        " specified here as additional versions. Used for generating" + 
+        " specified here as additional versions. Used for generating" +
         " multiarch images on different machines.")
     parser.add_argument(
         "--manifest-only", nargs="+",
