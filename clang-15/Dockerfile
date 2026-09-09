@@ -11,8 +11,8 @@ RUN apt-get update \
   ca-certificates \
  && rm -rf /var/lib/apt/lists/*
 
-ADD llvm.list /etc/apt/sources.list.d/
-ADD llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
+COPY llvm.list /etc/apt/sources.list.d/
+COPY llvm-snapshot.gpg.key.gpg /etc/apt/trusted.gpg.d/
 
 # Install pre-reqs
 RUN apt-get update \
