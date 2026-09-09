@@ -72,7 +72,7 @@ def test(image, test_version):
             msg += f"Not found in actual output: \n{output}\n"
             raise AssertionError(msg)
         else:
-            print("Corectly got:")
+            print("Correctly got:")
             print(output.decode())
     except Exception:
         print("Failure in command: " + cmd)
