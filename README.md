@@ -64,12 +64,11 @@ For each requested version it will, by default:
 4. optionally push, and optionally combine per-arch builds into a manifest.
 
 The default repo is `test/clang`, so a bare run builds and tags locally without touching
-Docker Hub. With no `-v`, every version in the `versions` list at the top of the script is
-built (15 through 23 — the pre-release 24 is opt-in via `-v 24`).
+Docker Hub. At least one `-v` is required; repeat it to act on several versions.
 
 ```bash
-# Build and test every version locally
-python build_img.py
+# Build and test one version locally
+python build_img.py -v 23
 
 # Build just Clang 22 and 23
 python build_img.py -v 22 -v 23
@@ -88,7 +87,7 @@ python build_img.py -v 23 -r teeks99/clang-ubuntu --manifest-only 23_amd64_20260
 
 | Option | Effect |
 | ------ | ------ |
-| `-v`, `--version` | Version to act on; repeat for several. Default: all versions in the script. |
+| `-v`, `--version` | Version to act on; repeat for several. Required. |
 | `-r`, `--repo` | Repo to tag and push to. Default `test/clang`; use `teeks99/clang-ubuntu` for Docker Hub. |
 | `-p`, `--push` | Push the tags that were created. |
 | `--arch [NAME]` | Include an architecture in the timestamp tag. Bare `--arch` autodetects (`amd64`/`arm64`). |

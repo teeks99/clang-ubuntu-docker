@@ -8,17 +8,6 @@ import platform
 options = None
 push_log = {"versions":{}}
 
-versions = [
-    # Jammy
-    "15", "16",
-    # Noble
-    "17", "18", "19", "20",
-    # Resolute
-    "21", "22", "23"
-    ]
-
-test_versions = {"4": "4.0", "5": "5.0", "6": "6.0"}
-
 class Image(object):
     def __init__(self, repo, tag):
         self.repo = repo
@@ -115,14 +104,6 @@ def remove_image(image):
     run_my_cmd(cmd)
 
 
-def all():
-    for version in versions:
-        latest = False
-        if options.latest and version == versions[-1]:
-            latest = True
-        build_one(version, latest)
-
-
 def build_one(version, push_latest=False):
     tags = []
     base_image = None
@@ -150,11 +131,7 @@ def build_one(version, push_latest=False):
         base_image = build(version)
 
     if not options.no_test:
-        tv = version
-        if version in test_versions:
-            tv = test_versions[version]
-
-        test(base_image, tv)
+        test(base_image, version)
 
     if not options.no_tag_timestamp:
         time_image = tag_timestamp(base_image, version)
@@ -194,9 +171,8 @@ def set_options():
     parser = argparse.ArgumentParser(
         description="Build one or more docker images for clang-ubuntu")
     parser.add_argument(
-        "-v", "--version", action="append",
-        help="Use one of more times to specify the versions to run, skip"
-        + " for all")
+        "-v", "--version", action="append", required=True,
+        help="Use one or more times to specify the versions to run")
     parser.add_argument(
         "--no-update-base", action="store_true",
         help="Don't update the base images")
@@ -265,11 +241,9 @@ def run():
         else:
             options.arch = machine
 
-    if options.version:
-        global versions
-        versions = options.version
-
-    all()
+    for version in options.version:
+        latest = options.latest and version == options.version[-1]
+        build_one(version, latest)
 
     if options.log_file:
         with open(options.log_file, "w") as f:
