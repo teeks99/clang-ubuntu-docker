@@ -42,22 +42,118 @@ def build(version):
     return image
 
 
+SMOKE_PASSED = "SMOKE TEST PASSED"
+
+# Compiled and run inside the image by the smoke test. Reports the clang version
+# it was built with and which standard library it picked up, so the test can
+# tell a libc++ build from a libstdc++ one.
+HELLO_WORLD = """\
+#include <iostream>
+#include <string>
+#include <vector>
+
+int main()
+{
+    std::vector<std::string> words = {"hello", "world"};
+    std::string message;
+    for (const std::string& word : words)
+    {
+        if (!message.empty())
+        {
+            message += ", ";
+        }
+        message += word;
+    }
+
+    std::cout << message << std::endl;
+    std::cout << "clang major: " << __clang_major__ << std::endl;
+#ifdef _LIBCPP_VERSION
+    std::cout << "stdlib: libc++ " << _LIBCPP_VERSION << std::endl;
+#else
+    std::cout << "stdlib: libstdc++" << std::endl;
+#endif
+    return 0;
+}
+"""
+
+# Fed to bash on the container's stdin, with the clang version as $1. Checks the
+# versioned compiler and both unversioned symlinks, then actually builds and
+# runs hello world, once with the default standard library and once with libc++.
+SMOKE_TEST = """\
+set -eu
+
+version="$1"
+work="$(mktemp -d)"
+trap 'rm -rf "$work"' EXIT
+
+fail() {
+    echo "SMOKE TEST FAILED: $*" >&2
+    exit 1
+}
+
+contains() {
+    case "$1" in
+        *"$2"*) return 0 ;;
+        *) return 1 ;;
+    esac
+}
+
+check_version() {
+    compiler="$1"
+    echo "--- $compiler --version"
+    output="$("$compiler" --version 2>&1)" || fail "could not run $compiler --version"
+    echo "$output"
+    contains "$output" "clang version $version" \\
+        || fail "$compiler is not clang version $version"
+}
+
+build_and_run() {
+    label="$1"
+    expect="$2"
+    shift 2
+    echo "--- clang++ $* -o hello_$label hello.cpp"
+    clang++ "$@" -o "$work/hello_$label" "$work/hello.cpp" \\
+        || fail "clang++ $* could not compile hello world"
+    output="$("$work/hello_$label" 2>&1)" || fail "the $label hello world would not run"
+    echo "$output"
+    contains "$output" "hello, world" \\
+        || fail "the $label hello world printed the wrong thing"
+    contains "$output" "clang major: $version" \\
+        || fail "the $label hello world was not built by clang $version"
+    if [ -n "$expect" ]; then
+        contains "$output" "$expect" \\
+            || fail "the $label hello world did not use $label"
+    fi
+}
+
+cat > "$work/hello.cpp" <<'END_OF_HELLO_WORLD'
+""" + HELLO_WORLD + ("""END_OF_HELLO_WORLD
+
+# The versioned binary, plus the unversioned symlinks the Dockerfile makes.
+check_version "clang++-$version"
+check_version clang++
+check_version clang
+
+# The default standard library is libstdc++ on these images, but only libc++ is
+# asserted: a default that moves is upstream's business, a libc++ that doesn't
+# work is ours.
+build_and_run default "" -std=c++17
+build_and_run libc++ "stdlib: libc++" -std=c++17 -stdlib=libc++
+
+echo "%s"
+""" % SMOKE_PASSED)
+
+
 def test(image, test_version):
-    cmd = f"docker run --rm {image.image} clang++-{test_version} --version"
-    expected = f"clang version {test_version}"
-    try:
-        print(cmd)
-        output = subprocess.check_output(cmd, shell=True)
-        if expected not in output.decode():
-            msg = f"Expected output: \n{expected}\n"
-            msg += f"Not found in actual output: \n{output}\n"
-            raise AssertionError(msg)
-        else:
-            print("Correctly got:")
-            print(output.decode())
-    except Exception:
-        print("Failure in command: " + cmd)
-        raise
+    cmd = f"docker run --rm -i {image.image} bash -s {test_version}"
+    print(cmd)
+    result = subprocess.run(
+        cmd, shell=True, input=SMOKE_TEST.encode(),
+        stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+    output = result.stdout.decode()
+    print(output)
+    if result.returncode != 0 or SMOKE_PASSED not in output:
+        raise AssertionError(f"Smoke test failed for {image.image}")
 
 
 def tag_timestamp(base_image, version):

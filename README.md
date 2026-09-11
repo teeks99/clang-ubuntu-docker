@@ -59,7 +59,9 @@ working `docker` CLI, and shells out to `docker` for everything.
 For each requested version it will, by default:
 
 1. `docker build --pull --no-cache` the matching `clang-<version>` directory,
-2. test the result by running `clang++-<version> --version` inside it and checking the output,
+2. smoke test the result inside the container: check that `clang++-<version>`, `clang++` and
+   `clang` all report the expected version, then compile and run a hello world with it,
+   once with the default standard library and once with `-stdlib=libc++`,
 3. apply a timestamp tag,
 4. optionally push, and optionally combine per-arch builds into a manifest.
 
