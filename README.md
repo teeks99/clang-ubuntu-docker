@@ -17,6 +17,7 @@ image is built on the Ubuntu release that LLVM publishes that version for.
 | 24 | `resolute` (26.04) | pre-release workflow (LLVM development snapshot) |
 
 Older versions (Clang < 15) are no longer built; their Ubuntu bases are out of support.
+The `Built by` column rotates as new versions appear — see [Adding a version](#adding-a-version).
 
 Each image installs `build-essential` plus the versioned LLVM packages — `clang`,
 `clang-tools`, `clang-format`, `python3-clang`, `libfuzzer`, `lldb`, `lld`, `libc++`,
@@ -65,8 +66,9 @@ For each requested version it will, by default:
 3. apply a timestamp tag,
 4. optionally push, and optionally combine per-arch builds into a manifest.
 
-The default repo is `test/clang`, so a bare run builds and tags locally without touching
-Docker Hub. At least one `-v` is required; repeat it to act on several versions.
+At least one `-v` is required; repeat it to act on several versions. The default repo is
+`test/clang`, so without `-r` and `-p` it builds and tags locally without touching Docker
+Hub.
 
 ```bash
 # Build and test one version locally
@@ -128,9 +130,29 @@ finishes.
 
 ## Adding a version
 
-Copy the newest `clang-<n>` directory to `clang-<n+1>`, update the `llvmver` and `release`
-ARGs in the `Dockerfile` and the suffix in `llvm.list`, then add the version to the
-`versions` list in `build_img.py` and to the relevant workflow.
+Versions enter as the pre-release build and rotate on from there: the pre-release becomes
+the current release, the current release drops back to legacy, and a new directory picks up
+the next development snapshot. To add Clang `<n+1>`, where `<n>` is the outgoing
+pre-release:
+
+1. Copy `clang-<n>` to `clang-<n+1>` and set `llvmver=<n+1>` in the `Dockerfile`. Leave its
+   `llvm.list` on the unsuffixed development repo (`llvm-toolchain-<release> main`) — that
+   is the snapshot the pre-release build tracks. If apt.llvm.org has moved to a newer
+   Ubuntu release, update the `release` ARG and the release name in `llvm.list` to match.
+2. Add the `-<n>` suffix to `clang-<n>/llvm.list`, making it
+   `llvm-toolchain-<release>-<n> main`. Now that `<n>` is released it has a repo of its
+   own, and the unsuffixed one has moved on to `<n+1>`.
+3. Rotate the workflows, which are the only place versions are listed:
+   - [`build-prerelease.yml`](.github/workflows/build-prerelease.yml): set `CLANG_VERSION`
+     to `<n+1>`.
+   - [`build-current.yml`](.github/workflows/build-current.yml): set `CLANG_VERSION` to
+     `<n>`. This is the build that also pushes `latest`.
+   - [`build-legacy.yml`](.github/workflows/build-legacy.yml): append the version
+     `build-current.yml` was previously building to the `versions` array in the
+     `set-versions` step.
+4. Update the [Images](#images) and [Automated builds](#automated-builds) tables above.
+
+`build_img.py` needs no changes — it builds whatever versions `-v` names.
 
 ## License
 
