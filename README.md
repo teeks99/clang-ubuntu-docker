@@ -116,17 +116,36 @@ the manifest job:
 
 ## Automated builds
 
-Three GitHub Actions workflows in [.github/workflows](.github/workflows) build on
-`ubuntu-latest` and `ubuntu-24.04-arm`, then join the two into a manifest. All three can
-also be started by hand with `workflow_dispatch`, and each one triggers a matching
+Four GitHub Actions workflows in [.github/workflows](.github/workflows) build on
+`ubuntu-latest` and `ubuntu-24.04-arm`, then join the two into a manifest. All of them can
+be started by hand with `workflow_dispatch`, and each one triggers a matching
 [teeks99/boost-cpp-docker](https://github.com/teeks99/boost-cpp-docker) build when it
 finishes.
 
 | Workflow | Schedule | Versions |
 | -------- | -------- | -------- |
 | `build-current.yml` | Monthly, 1st at 00:00 UTC | 23, and updates `latest` |
-| `build-legacy.yml` | May 1 and Nov 1 | 15–22 |
+| `build-legacy.yml` | May 1 and Nov 1 | 15–22, one matrix job per version |
 | `build-prerelease.yml` | Weekly, Sundays | 24 |
+| `build-one.yml` | Manual only | Whichever single version you ask for |
+
+The legacy workflow keeps going when a single version fails, so the versions that did build
+on both arches still get their manifests.
+
+### Building one version by hand
+
+`build-one.yml` is the "build just this one" button: run it from the Actions tab, type a
+version, and it does the same amd64 + arm64 + manifest cycle the scheduled workflows do.
+It reads the version from the form rather than from a list in the file, so any version with
+a `clang-<version>` directory works without editing the workflow — including a brand new one
+that is not wired into a scheduled workflow yet.
+
+| Input | Default | Effect |
+| ----- | ------- | ------ |
+| `version` | — | The Clang version to build. Must be a number with a matching `clang-<version>` directory, or the run fails immediately. |
+| `push` | on | Push to Docker Hub. Turn it off for a build-and-test dry run — nothing is published and the manifest job is skipped. |
+| `latest` | off | Also re-point the `latest` tag at this build. |
+| `trigger_boost` | on | Trigger the downstream boost-cpp-docker build once the manifest is up. |
 
 ## Adding a version
 
@@ -142,7 +161,11 @@ pre-release:
 2. Add the `-<n>` suffix to `clang-<n>/llvm.list`, making it
    `llvm-toolchain-<release>-<n> main`. Now that `<n>` is released it has a repo of its
    own, and the unsuffixed one has moved on to `<n+1>`.
-3. Rotate the workflows, which are the only place versions are listed:
+3. Check the new directory actually builds on both arches: run
+   [`build-one.yml`](.github/workflows/build-one.yml) against `<n+1>` from the Actions tab
+   with `push` turned off. Nothing is published, so it is safe to repeat while fixing the
+   Dockerfile.
+4. Rotate the workflows, which are the only place versions are listed:
    - [`build-prerelease.yml`](.github/workflows/build-prerelease.yml): set `CLANG_VERSION`
      to `<n+1>`.
    - [`build-current.yml`](.github/workflows/build-current.yml): set `CLANG_VERSION` to
@@ -150,7 +173,7 @@ pre-release:
    - [`build-legacy.yml`](.github/workflows/build-legacy.yml): append the version
      `build-current.yml` was previously building to the `versions` array in the
      `set-versions` step.
-4. Update the [Images](#images) and [Automated builds](#automated-builds) tables above.
+5. Update the [Images](#images) and [Automated builds](#automated-builds) tables above.
 
 `build_img.py` needs no changes — it builds whatever versions `-v` names.
 
